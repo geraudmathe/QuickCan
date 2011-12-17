@@ -1,0 +1,74 @@
+<html>
+<script type="text/javascript" src="http://www.prototypejs.org/assets/2008/9/29/prototype-1.6.0.3.js"></script>
+<style>
+body {background: #fff; color: #ccc;}
+</style>
+
+<body>
+<div id="test">
+    <canvas id="cvsTest" height="200" width="400" style="background-color:gray" />
+</div>
+<script type="text/javascript">
+  var canvas  = document.getElementById("cvsTest");
+  ctx = canvas.getContext('2d');
+  curposX = curposY = 0;
+  curpospX = curpospY = 0;
+  interval = null;
+  
+  function drawCurve(bx,by,cx,cy,ex,ey){
+    
+     NewCanvasElement = document.createElement('canvas');
+     NewCanvasElement.width = 400;
+     NewCanvasElement.height = 200;
+     NewCanvasElement.setAttribute('style','background-color:gray;float:left;clear:both');
+     document.body.appendChild(NewCanvasElement);
+    
+    ctx  = NewCanvasElement.getContext('2d');
+    
+    ctx.clearRect(bx,by-10,ex,ey)
+    if(curposX >= ex || curposY >= ey){
+      clearInterval(interval);
+    }
+     var deltaX = Math.abs( ex - bx );
+     var deltaY = Math.abs( ey - by );
+     var diffX = 1, diffY = 1;
+     if( deltaX > deltaY ){
+      diffY = deltaY / deltaX;
+     }
+     else if( deltaX < deltaY ) {
+      diffX = deltaX / deltaY;
+      }
+    curposX+= diffX
+    curposY+= diffY
+    curpospX++
+    ctx.strokeStyle = "red";
+    ctx.beginPath();
+    ctx.moveTo(bx,by);
+    ctx.lineTo(curpospX,curpospY);
+    ctx.moveTo(curpospX,curpospY);
+    ctx.lineTo( curposX, curposY);
+    ctx.stroke();
+     
+     
+    ctx.strokeStyle = "white";
+    ctx.beginPath();
+    ctx.moveTo(bx,by);
+    console.log(curpospY)
+     ctx.quadraticCurveTo(curpospX,curpospY,curposX,curposY);
+     ctx.stroke();
+  }
+  
+  function drawControlLines(bx,by,cx,cy,ex,ey){
+    curposX = bx;
+    curposY = bx;
+    curpospX = bx;
+    curpospY = cy;
+    interval = setInterval('drawCurve('+bx+','+by+','+cx+','+cy+','+ex+','+ey+')',10)
+  }
+  
+
+  drawControlLines(30,30,250,30,300,150)
+</script>
+
+</body>
+</html>

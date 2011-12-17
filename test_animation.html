@@ -1,0 +1,163 @@
+<html>
+<script type="text/javascript" src="http://www.prototypejs.org/assets/2008/9/29/prototype-1.6.0.3.js"></script>
+<style>
+body {background: #fff; color: #ccc;}
+</style>
+
+<body>
+<canvas id="cnvs" width="500" height="500" style="border: 1px solid #ccc;"></canvas>
+
+<script type="text/javascript">
+var curposx = 150;
+var curposy = 25;
+currentDraw = 0;
+isFinished =false;
+pointsRef = [{bx:250,by:30,ex:150, ey:250,ref:"0"},
+             {bx:150,by:250,ex:350, ey:130,ref:"1"},
+             {bx:350,by:130,ex:150, ey:130,ref:"2"},
+             {bx:150,by:130,ex:350, ey:250,ref:"3"},
+             {bx:350,by:250,ex:250, ey:30,ref:"4"}
+             
+            ]
+linesDrawing = []
+var myinterval;
+     var canvas = document.getElementById('cnvs');
+     var ctx = canvas.getContext('2d');
+
+function writeNewLine(){
+  currentAddress = pointsRef[currentDraw];
+  console.log(currentDraw);
+  console.log("pointsRef"+pointsRef[currentDraw]);
+  myinterval = setInterval( ' animate('+currentAddress.bx+','+currentAddress.by+','+currentAddress.ex+', '+currentAddress.ey+','+currentAddress.ref+') ', 1);
+  currentDraw++
+}
+
+
+function random (n)
+{
+  return (Math.floor (Math.random() * n));
+}
+
+function animate(startpointx,startpointy,endpointx, endpointy,ref) {
+        //FIrst we create the place mememory fro curposx and curposy
+        
+        if(linesDrawing[ref]==undefined){
+          linesDrawing[ref] = {curposx:startpointx,curposy:startpointy}
+        }
+          if(startpointx <= endpointx){
+            if(startpointy <= endpointy){
+              orientation = "DR"
+              if (linesDrawing[ref].curposx >= endpointx && linesDrawing[ref].curposy >= endpointy)
+                isFinished = true;
+            }else{
+              orientation = "UR";
+              if (linesDrawing[ref].curposx >= endpointx && linesDrawing[ref].curposy <= endpointy)
+                isFinished = true;
+            }
+          }
+          else{
+            if(startpointy <= endpointy){
+              orientation = "DL"
+              if (linesDrawing[ref].curposx <= endpointx && linesDrawing[ref].curposy >= endpointy)
+                isFinished = true;
+            }
+            else{
+              orientation = "UL";
+              if (linesDrawing[ref].curposx < endpointx && linesDrawing[ref].curposy < endpointy)
+                isFinished = true;
+            }
+          }
+          if(isFinished){
+                isFinished = false;
+                clearInterval(myinterval);
+                console.log("End"+orientation);
+                writeNewLine();
+                return false;
+          }
+          
+           linesDrawing[ref].orientation = orientation;
+           var deltaX = Math.abs( endpointx - startpointx );
+           var deltaY = Math.abs( endpointy - startpointy );
+           var diffX = 1, diffY = 1;
+           if(orientation=="DL" ||orientation=="DR"){
+             if( deltaX > deltaY )
+                diffY = deltaY / deltaX;
+             else if( deltaX < deltaY )
+                diffX = deltaX / deltaY;
+           }
+           else if(orientation=="UR"){
+             if( deltaX > deltaY )
+                diffY =  deltaY/deltaX ;
+             else if( deltaX < deltaY )
+                diffX = deltaY / deltaX;
+           }
+           else if(orientation=="UL"){
+             if( deltaX > deltaY )
+              diffY = deltaX / deltaY;
+             else if( deltaX < deltaY )
+              diffX =  deltaX /deltaY ;
+           }
+           if(orientation=="DL"){
+                 if(linesDrawing[ref].curposx != endpointx){
+                   if(endpointx > linesDrawing[ref].curposx) 
+                     linesDrawing[ref].curposx = linesDrawing[ref].curposx + diffX;
+                   else
+                     linesDrawing[ref].curposx = linesDrawing[ref].curposx - diffX;
+                 }
+                 if(linesDrawing[ref].curposy <= endpointy)
+                   linesDrawing[ref].curposy = linesDrawing[ref].curposy + diffY;
+           }
+        else if(orientation=="DR"){
+                 if(linesDrawing[ref].curposx != endpointx){
+                   if(endpointx > linesDrawing[ref].curposx)
+                     linesDrawing[ref].curposx = linesDrawing[ref].curposx + diffX;
+                   else
+                     linesDrawing[ref].curposx = linesDrawing[ref].curposx - diffX;
+                 }
+                 if(linesDrawing[ref].curposy <= endpointy)
+                   linesDrawing[ref].curposy = linesDrawing[ref].curposy + diffY;
+        }
+        else if(orientation=="UR"){
+                 if(linesDrawing[ref].curposx != endpointx){
+                   if(endpointx > linesDrawing[ref].curposx)
+                     linesDrawing[ref].curposx = linesDrawing[ref].curposx + diffX;
+                   else
+                     linesDrawing[ref].curposx = linesDrawing[ref].curposx - diffX;
+                 }
+                 if(linesDrawing[ref].curposy >= endpointy)
+                   linesDrawing[ref].curposy = linesDrawing[ref].curposy - diffY;
+        }
+        else if(orientation=="UL"){
+         if(linesDrawing[ref].curposx != endpointx){
+           if(endpointx > linesDrawing[ref].curposx)
+             linesDrawing[ref].curposx = linesDrawing[ref].curposx + diffX;
+           else
+             linesDrawing[ref].curposx = linesDrawing[ref].curposx - diffX;
+         }
+         if(linesDrawing[ref].curposy >= endpointy)
+           linesDrawing[ref].curposy = linesDrawing[ref].curposy - diffY;
+        }
+        drawShape(startpointx,startpointy,linesDrawing[ref].curposx, linesDrawing[ref].curposy, "blue");
+}
+
+function drawShape(startpointx,startpointy,tendpointx, tendpointy, clor){
+     var canvas = document.getElementById('cnvs');
+     var ctx = canvas.getContext('2d');
+
+       //ctx.clearRect(0,0,310,400);
+       ctx.strokeStyle = clor;
+         ctx.beginPath();
+         ctx.moveTo(startpointx ,startpointy );
+         ctx.lineTo(tendpointx,tendpointy);
+         ctx.fillStyle = "green";
+         ctx.fill()
+         ctx.stroke();
+}  
+
+//  
+writeNewLine();
+
+</script>
+
+</body>
+</html>
